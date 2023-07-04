@@ -9,6 +9,12 @@ So with this map, i could get their exact geolocation where they are, and i get 
 
 If you want to see pictures of code working in action vistit website https://www.pointperks.net/shopify-geolocation-addon-for-cart/ to see pictures and in the website page i will provide link to the actual website where i implemented the code, so you can see that it is functioning.
 
+Donate a taco, the more tacos i get the more i can create free scripts:
+
+https://ko-fi.com/salvadorcarrillo_c
+
+https://www.buymeacoffee.com/pointperksH
+
                                   .--===-:.                                           
                                .+*########**+:                                        
                               =*#############*=                                       
