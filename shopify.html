@@ -1,0 +1,352 @@
+<html>
+    <h1 align="center">⬇️GPS delivery for Mexico only⬇️</h1>
+    <h4 align="center"><strong>(Orders for USA/Rest of world skip to checkout below)</strong></h4>
+    <h2 align="center">(For local delivery click "Locate me" button then checkout below when ready)</h2>
+    <h4 align="center"><strong>(Please "click allow" to get location when prompted)</strong></h4>
+  <head>
+      <title>Simple Map</title>
+      <meta name="viewport" content="initial-scale=1.0">
+      <meta charset="utf-8">
+      <style>
+          /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+          #map {
+              height: 100%;
+              width: 100%;
+          }
+  
+          .map_parent {
+              width: 1000px;
+              height: 400px;
+              position: relative;
+              margin: 50px auto;
+          }
+  
+  
+          #pin {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+          }
+  
+          .controls {
+              font-size: 1em;
+              line-height: 1.5em;
+              font-family: Arial;
+              margin: 50px auto;
+              width: 400px;
+          }
+  
+          input, button {
+              line-height: 44px;
+              border-radius: 4px;
+              border: 0;
+              font-size: 1.5em;
+              padding: 0 20px;
+          }
+  
+          input {
+              background: #eee;
+              width: 240px;
+          }
+  
+          button {
+              color: white;
+              cursor: pointer;
+              background-color: darkgreen;
+              border: 0;
+              font-weight: bold;
+          }
+          
+          button:hover {
+              background-color: darkblue;
+          }
+  
+          /* Optional: Makes the sample page fill the window. */
+          html,
+          body {
+              height: 100%;
+              margin: 0;
+              padding: 0;
+          }
+      </style>
+  </head>
+  
+  <body>
+      <div class="controls">
+          <div id="coordinates">
+              latitude: <span id="latitude">x</span><br />
+              longitude: <span id="longitude">y</span><br />
+              address: <span id="address">z</span><br />
+        </div>
+          <br />
+          <input type="text" id="address-input" placeholder="Search a place on a map">
+          <button type="button" id="find-address" onclick="findPlace()">Find</button>
+          <br /><br />
+  
+          <button type="button" onclick="geolocation(); coord();">Locate me</button>
+      </div>
+      <div class="map_parent">        
+          <div id="map">
+          </div>
+          <img src="[add source of pin image]" id="pin" />
+      </div>
+  
+    
+      <script>
+          // Note: This example requires that you consent to location sharing when
+          // prompted by your browser. If you see the error "The Geolocation service
+          // failed.", it means you probably did not give permission for the browser to
+          // locate you.
+          var map, infoWindow;
+          var longitude, latitude;
+          var geocoder;
+          var san_felipe = { lat: 31.025071, lng: -114.840778 };
+          
+  
+        function coord() {
+              map.addListener('center_changed', function() {
+                  longitude = map.getCenter().lng();
+                  latitude = map.getCenter().lat();
+                  
+                  document.getElementById('longitude').innerText = longitude;
+                  document.getElementById('latitude').innerText = latitude;
+                    
+                    //JSON.stringify(latitude);
+                    //JSON.stringify(longitude);
+                
+                var pointa = latitude;  //.toFixed(6) //remember both lat and latitude
+                var pointb = longitude;
+                var pointc = +pointa + "," + pointb;
+                var mapgeo = "https://maps.google.com/?q=" + pointc;
+                //var pointb = longitude;
+                //JSON.stringify(points);
+                //alert(latitude);
+                //alert(longitude);
+                //alert(points);
+                jQuery.post('/cart/add.js', {
+                  quantity: 1,
+                  id: [add_gps_coordinates_id],
+                  properties: {
+                    'Latitude/Longitude': pointc,
+                    '_Map': mapgeo
+                  }
+                }); 
+              });
+                  
+               
+               
+              //var test = latitude;
+              
+              //test["Coordinatess"] = latitude, longitude;
+            //jQuery.post('/cart/add.js', {
+            //quantity: 1,
+           // id: [add_gps_coordinates_id],
+            //properties: {
+            //  points,
+             // 'Additional Information': 'test',
+              //'Map': 'test'
+           
+            //}
+            //additional_details: {'Latitude/Longitude': latlng;,
+                                 //'Map': 'https://maps.google.com/?q='latlng; 
+                               //}
+          //});
+          }
+          function initMap() {
+              map = new google.maps.Map(document.getElementById('map'), {
+                  center: san_felipe,
+                  zoom: 13
+              });
+              infoWindow = new google.maps.InfoWindow;
+              geocoder = new google.maps.Geocoder;
+  
+  
+              // GET coordinates and adress
+              map.addListener('center_changed', function() {
+                  longitude = map.getCenter().lng();
+                  latitude = map.getCenter().lat();
+  
+                  document.getElementById('longitude').innerText = longitude;
+                  document.getElementById('latitude').innerText = latitude;
+  
+              });
+  
+              map.addListener('dragend', function() {
+                  longitude = map.getCenter().lng();
+                  latitude = map.getCenter().lat();
+  
+                  geocodeLatLng(latitude, longitude, geocoder, map);
+              })
+  
+          }
+  
+          // GEOLOCATION
+          function geolocation() {
+              if (navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(function(position) {
+                      var pos = {
+                          lat: position.coords.latitude,
+                          lng: position.coords.longitude
+                      };
+                      
+                      map.setCenter(pos);
+                   
+                  }, function() {
+                      handleLocationError(true, infoWindow, map.getCenter());
+                  });
+              } else {
+                  // Browser doesn't support Geolocation
+                  handleLocationError(false, infoWindow, map.getCenter());
+              }
+         
+          }
+          // GEOLOCATION Error
+          function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+              infoWindow.setPosition(pos);
+              infoWindow.setContent(browserHasGeolocation ?
+                                  'Error: The Geolocation service failed.' :
+                                  'Error: Your browser doesn\'t support geolocation.');
+              infoWindow.open(map);
+          }
+  
+          // FIND a place
+          function findPlace() {
+  
+              var input = document.getElementById('address-input').value;
+              console.log(input);
+  
+              var request = {
+                  query: input,
+                  fields: ['name', 'geometry'],
+              };
+  
+              service = new google.maps.places.PlacesService(map);
+  
+              service.findPlaceFromQuery(request, function(results, status) {
+                  if (status === google.maps.places.PlacesServiceStatus.OK) {
+                      map.setCenter(results[0].geometry.location);
+                      console.log(results[0]);
+  
+                      lat = map.getCenter().lat();
+                      lng = map.getCenter().lng();
+  
+                      geocodeLatLng(lat, lng, geocoder, map);
+                  }
+              });
+          };
+          var latlng = {lat: latitude, lng: longitude};
+          function entry(latitude, longitude) {
+          var loca = {latitude, longitude};
+         loca;}
+          // GET address
+          function geocodeLatLng(latitude, longitude, geocoder, map) {
+              var latlng = {lat: latitude, lng: longitude};
+              var address = document.getElementById('address');
+  
+              geocoder.geocode({'location': latlng}, function(results, status) {
+                  if (status === 'OK') {
+                      if (results[0]) {
+                          address.innerText = results[0].formatted_address;
+                      } else {
+                          address.innerText = 'No results found';
+                      }
+                  } else {
+                      window.alert('Geocoder failed due to: ' + status);
+                  }
+              });
+          }
+          function recodeAddress(address_components) {
+                    console.log("recodeAddress_function")
+   
+                    let keys = Object.keys(address_components);
+                    tmp_data = address_components;
+   
+                    itemRoute = '';
+                    itemSnumber = '';
+                    itemCountry = '';
+                    itemLocality = '';
+   
+                    // iterate through address_component array
+                    for (const key of keys) {
+                      console.log('address_component:' + key);
+   
+                      if (address_components[key].types == "route"){
+                          console.log(": route:"+address_components[key].long_name);
+                          itemRoute = address_components[key].long_name;
+                      }
+   
+                      if (address_components[key].types == "locality" || address_components[key].types[0] == "locality" ){
+                          console.log("town:"+address_components[key].long_name);
+                          itemLocality = address_components[key].long_name;
+                      }
+   
+                      if (address_components[key].types == "country" || address_components[key].types[0] == "country" ){ 
+                          console.log("country:"+address_components[key].long_name); 
+                          itemCountry = address_components[key].long_name;
+                      }
+   
+                      // if (address_components[key].types == "postal_code_prefix"){ 
+                      //     console.log("pc:"+address_components[key].long_name);  
+                      //     itemPc = address_components[key].long_name;
+                      // }
+   
+                      if (address_components[key].types == "street_number"){ 
+                          console.log("street_number:"+address_components[key].long_name);  
+                          itemSnumber = address_components[key].long_name;
+                      }
+                      //return false; // break the loop
+                    }
+                  }
+   
+                  // PASS adress to Checkout
+          function passAddressToCheckout() {
+                    // ?checkout[shipping_address][city]=Dubai
+   
+                    let form = document.getElementById('cart-form');
+                    let prefillData = '';
+   
+                    if (itemRoute) {
+                      prefillData += "checkout[shipping_address][address1]=" + itemRoute;
+                      console.log(prefillData);
+   
+                      if (itemSnumber) {
+                        prefillData += " " + itemSnumber;
+                        console.log(prefillData);
+                      }
+                    }
+   
+                    if (itemLocality) {
+                      prefillData += "&checkout[shipping_address][city]=" + itemLocality;
+                      console.log(prefillData);
+                    }
+   
+                    // if there are any data to prefill add question mark
+                    if (prefillData) {
+                      form.action = "?" + prefillData;
+                      console.log(form.action);
+                    }
+   
+                    // There is no option to prefill country. And Google does not share Zip code
+   
+                  }
+                  
+          function revealMapAndCoordinates() {
+                    
+                    let mapDiv = document.getElementById('map-column');
+                    let coordinatesDiv = document.getElementById('coordinates');
+                    
+                    mapDiv.style.display="block";
+                    
+                    coordinatesDiv.classList.remove("hidden");
+                    
+                  }
+   
+  
+      </script>
+      <script src="https://maps.googleapis.com/maps/api/js?key={add your own api key}&libraries=places&callback=initMap"
+          async defer></script>
+  </body>
+  
+  </html> 
+  <h4><strong>Type +52 following your phone number if you have a mexican phone for contact information next page</strong></h4> 
